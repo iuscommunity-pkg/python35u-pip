@@ -1,13 +1,9 @@
 %global build_wheel 0
 %global with_tests 0
 
-%if 0%{?rhel} && 0%{?rhel} < 6
-%{!?python_sitelib: %global python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print(get_python_lib())")}
-%endif
-
 %global srcname pip
 %if 0%{?build_wheel}
-%global python2_wheelname %{srcname}-%{version}-py2.py3-none-any.whl
+%global python35u_wheelname %{srcname}-%{version}-py2.py3-none-any.whl
 %endif
 
 %global bashcompdir %(b=$(pkg-config --variable=completionsdir bash-completion 2>/dev/null); echo ${b:-%{_sysconfdir}/bash_completion.d})
@@ -15,7 +11,9 @@
 %global bashcomp2 1
 %endif
 
-Name:           python-%{srcname}
+%global ius_suffix 35u
+
+Name:           python%{ius_suffix}-%{srcname}
 Version:        7.1.0
 Release:        1.ius%{?dist}
 Summary:        A tool for installing and managing Python packages
@@ -38,21 +36,21 @@ BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildArch:      noarch
 BuildRequires:  bash-completion
-BuildRequires:  python-devel
-BuildRequires:  python-setuptools
+BuildRequires:  python%{ius_suffix}-devel
+BuildRequires:  python%{ius_suffix}-setuptools
 %if 0%{?with_tests}
-BuildRequires:  python-mock
-BuildRequires:  pytest
-BuildRequires:  python-pretend
-BuildRequires:  python-freezegun
-BuildRequires:  python-scripttest
-BuildRequires:  python-virtualenv
+BuildRequires:  python%{ius_suffix}-mock
+BuildRequires:  python%{ius_suffix}-pytest
+BuildRequires:  python%{ius_suffix}-pretend
+BuildRequires:  python%{ius_suffix}-freezegun
+BuildRequires:  python%{ius_suffix}-scripttest
+BuildRequires:  python%{ius_suffix}-virtualenv
 %endif
 %if 0%{?build_wheel}
-BuildRequires:  python-pip
-BuildRequires:  python-wheel
+BuildRequires:  python%{ius_suffix}-pip
+BuildRequires:  python%{ius_suffix}-wheel
 %endif
-Requires:       python-setuptools
+Requires:       python%{ius_suffix}-setuptools
 
 
 %description
@@ -75,42 +73,30 @@ tar -xf %{SOURCE1}
 
 %build
 %if 0%{?build_wheel}
-%{__python} setup.py bdist_wheel
+%{__python35u} setup.py bdist_wheel
 %else
-%{__python} setup.py build
+%{__python35u} setup.py build
 %endif
 
 
 %install
 %if 0%{?build_wheel}
-pip2 install -I dist/%{python2_wheelname} --root %{buildroot} --strip-file-prefix %{buildroot}
+pip%{python35u_version} install -I dist/%{python35u_wheelname} --root %{buildroot} --strip-file-prefix %{buildroot}
 %else
-%{__python} setup.py install -O1 --skip-build --root %{buildroot}
+%{__python35u} setup.py install -O1 --skip-build --root %{buildroot}
 %endif
 
 mkdir -p %{buildroot}%{bashcompdir}
-PYTHONPATH=%{buildroot}%{python_sitelib} \
-    %{buildroot}%{_bindir}/pip completion --bash \
-    > %{buildroot}%{bashcompdir}/pip
-pips2=pip
-pips3=pip3
-for pip in %{buildroot}%{_bindir}/pip*; do
-    pip=$(basename $pip)
-    case $pip in
-        pip2*)
-            pips2="$pips2 $pip"
-%if 0%{?bashcomp2}
-            ln -s pip %{buildroot}%{bashcompdir}/$pip
-%endif
-            ;;
-    esac
-done
-sed -i -e "s/^\\(complete.*\\) pip\$/\\1 $pips2/" \
-    %{buildroot}%{bashcompdir}/pip
+PYTHONPATH=%{buildroot}%{python35u_sitelib} \
+    %{buildroot}%{_bindir}/pip%{python35u_version} completion --bash \
+    > %{buildroot}%{bashcompdir}/pip%{python35u_version}
+sed -i -e "s/^\\(complete.*\\) pip\$/\\1 pip%{python35u_version}/" \
+    %{buildroot}%{bashcompdir}/pip%{python35u_version}
+
 
 %if 0%{?with_tests}
 %check
-py.test -m 'not network'
+py.test-%{python35u_version} -m 'not network'
 %endif
 
 
@@ -119,8 +105,8 @@ py.test -m 'not network'
 %license LICENSE.txt
 %doc README.rst docs
 %attr(755,root,root) %{_bindir}/pip
-%attr(755,root,root) %{_bindir}/pip2*
-%{python_sitelib}/pip*
+%attr(755,root,root) %{_bindir}/pip%{python35u_version}
+%{python35u_sitelib}/pip*
 %{bashcompdir}
 %if 0%{?bashcomp2}
 %dir %(dirname %{bashcompdir})
@@ -131,6 +117,7 @@ py.test -m 'not network'
 * Fri Nov 20 2015 Carl George <carl.george@rackspace.com> - 7.1.0-1.ius
 - Initial import from Fedora
 - Remove subpackage structure and related things
+- Use python35u names and macros
 
 * Wed Oct 14 2015 Robert Kuska <rkuska@redhat.com> - 7.1.0-3
 - Rebuilt for Python3.5 rebuild
