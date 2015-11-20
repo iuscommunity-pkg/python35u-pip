@@ -22,7 +22,7 @@
 
 Name:           python-%{srcname}
 Version:        7.1.0
-Release:        3%{?dist}
+Release:        1.ius%{?dist}
 Summary:        A tool for installing and managing Python packages
 
 Group:          Development/Libraries
@@ -232,6 +232,9 @@ popd
 %endif # with_python3
 
 %changelog
+* Fri Nov 20 2015 Carl George <carl.george@rackspace.com> - 7.1.0-1.ius
+- Initial import from Fedora
+
 * Wed Oct 14 2015 Robert Kuska <rkuska@redhat.com> - 7.1.0-3
 - Rebuilt for Python3.5 rebuild
 - With wheel set to 1
