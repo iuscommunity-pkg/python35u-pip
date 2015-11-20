@@ -83,8 +83,6 @@ tar -xf %{SOURCE1}
 
 
 %install
-%{__rm} -rf %{buildroot}
-
 %if 0%{?build_wheel}
 pip2 install -I dist/%{python2_wheelname} --root %{buildroot} --strip-file-prefix %{buildroot}
 %else
@@ -117,15 +115,7 @@ py.test -m 'not network'
 %endif
 
 
-%clean
-%{__rm} -rf %{buildroot}
-
-# unfortunately, pip's test suite requires virtualenv >= 1.6 which isn't in
-# fedora yet. Once it is, check can be implemented
-
-
 %files
-%defattr(-,root,root,-)
 %{!?_licensedir:%global license %%doc}
 %license LICENSE.txt
 %doc README.rst docs
