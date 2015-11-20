@@ -14,7 +14,7 @@
 %global ius_suffix 35u
 
 Name:           python%{ius_suffix}-%{srcname}
-Version:        7.1.0
+Version:        7.1.2
 Release:        1.ius%{?dist}
 Summary:        A tool for installing and managing Python packages
 
@@ -116,11 +116,12 @@ py.test-%{python35u_version} -m 'not network'
 
 
 %changelog
-* Fri Nov 20 2015 Carl George <carl.george@rackspace.com> - 7.1.0-1.ius
+* Fri Nov 20 2015 Carl George <carl.george@rackspace.com> - 7.1.2-1.ius
 - Initial import from Fedora
 - Remove subpackage structure and related things
 - Use python35u names and macros
 - Remove pip and pip3 to allow parallel installs
+- Latest upstream
 
 * Wed Oct 14 2015 Robert Kuska <rkuska@redhat.com> - 7.1.0-3
 - Rebuilt for Python3.5 rebuild
