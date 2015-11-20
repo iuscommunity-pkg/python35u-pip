@@ -1,5 +1,4 @@
 %if (! 0%{?rhel}) || 0%{?rhel} > 7
-%global with_python3 1
 %global build_wheel 1
 %global with_tests 0
 %endif
@@ -10,9 +9,6 @@
 %global srcname pip
 %if 0%{?build_wheel}
 %global python2_wheelname %{srcname}-%{version}-py2.py3-none-any.whl
-%if 0%{?with_python3}
-%global python3_wheelname %python2_wheelname
-%endif
 %endif
 
 %global bashcompdir %(b=$(pkg-config --variable=completionsdir bash-completion 2>/dev/null); echo ${b:-%{_sysconfdir}/bash_completion.d})
@@ -42,6 +38,7 @@ Patch0:         pip-1.5rc1-allow-stripping-prefix-from-wheel-RECORD-files.patch
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildArch:      noarch
+BuildRequires:  bash-completion
 BuildRequires:  python-devel
 BuildRequires:  python-setuptools
 %if 0%{?with_tests}
@@ -58,41 +55,13 @@ BuildRequires:  python-wheel
 %endif
 Requires:       python-setuptools
 
+
 %description
 Pip is a replacement for `easy_install
 <http://peak.telecommunity.com/DevCenter/EasyInstall>`_.  It uses mostly the
 same techniques for finding packages, so packages that were made
 easy_installable should be pip-installable as well.
 
-
-%if 0%{?with_python3}
-%package -n python3-pip
-Summary:        A tool for installing and managing Python3 packages
-Group:          Development/Libraries
-
-BuildRequires:  python3-devel
-BuildRequires:  python3-setuptools
-BuildRequires:  bash-completion
-%if 0%{?with_tests}
-BuildRequires:  python3-mock
-BuildRequires:  python3-pytest
-BuildRequires:  python3-pretend
-BuildRequires:  python3-freezegun
-BuildRequires:  python3-scripttest
-BuildRequires:  python3-virtualenv
-%endif
-%if 0%{?build_wheel}
-BuildRequires:  python3-pip
-BuildRequires:  python3-wheel
-%endif
-Requires:  python3-setuptools
-
-%description -n python3-pip
-Pip is a replacement for `easy_install
-<http://peak.telecommunity.com/DevCenter/EasyInstall>`_.  It uses mostly the
-same techniques for finding packages, so packages that were made
-easy_installable should be pip-installable as well.
-%endif # with_python3
 
 %prep
 %setup -q -n %{srcname}-%{version}
@@ -104,10 +73,6 @@ tar -xf %{SOURCE1}
 
 %{__sed} -i '1d' pip/__init__.py
 
-%if 0%{?with_python3}
-cp -a . %{py3dir}
-%endif # with_python3
-
 
 %build
 %if 0%{?build_wheel}
@@ -116,31 +81,9 @@ cp -a . %{py3dir}
 %{__python} setup.py build
 %endif
 
-%if 0%{?with_python3}
-pushd %{py3dir}
-%if 0%{?build_wheel}
-%{__python3} setup.py bdist_wheel
-%else
-%{__python3} setup.py build
-%endif
-popd
-%endif # with_python3
-
 
 %install
 %{__rm} -rf %{buildroot}
-
-%if 0%{?with_python3}
-pushd %{py3dir}
-%if 0%{?build_wheel}
-pip3 install -I dist/%{python3_wheelname} --root %{buildroot} --strip-file-prefix %{buildroot}
-# TODO: we have to remove this by hand now, but it'd be nice if we wouldn't have to
-# (pip install wheel doesn't overwrite)
-rm %{buildroot}%{_bindir}/pip
-%else
-%{__python3} setup.py install --skip-build --root %{buildroot}
-%endif
-%endif # with_python3
 
 %if 0%{?build_wheel}
 pip2 install -I dist/%{python2_wheelname} --root %{buildroot} --strip-file-prefix %{buildroot}
@@ -152,11 +95,6 @@ mkdir -p %{buildroot}%{bashcompdir}
 PYTHONPATH=%{buildroot}%{python_sitelib} \
     %{buildroot}%{_bindir}/pip completion --bash \
     > %{buildroot}%{bashcompdir}/pip
-%if 0%{?with_python3}
-PYTHONPATH=%{buildroot}%{python3_sitelib} \
-    %{buildroot}%{_bindir}/pip3 completion --bash \
-    > %{buildroot}%{bashcompdir}/pip3
-%endif
 pips2=pip
 pips3=pip3
 for pip in %{buildroot}%{_bindir}/pip*; do
@@ -168,30 +106,14 @@ for pip in %{buildroot}%{_bindir}/pip*; do
             ln -s pip %{buildroot}%{bashcompdir}/$pip
 %endif
             ;;
-%if 0%{?with_python3}
-        pip3?*)
-            pips3="$pips3 $pip"
-%if 0%{?bashcomp2}
-            ln -s pip3 %{buildroot}%{bashcompdir}/$pip
-%endif
-            ;;
-%endif
     esac
 done
-%if 0%{?with_python3}
-sed -i -e "s/^\\(complete.*\\) pip\$/\\1 $pips3/" \
-    -e s/_pip_completion/_pip3_completion/ \
-    %{buildroot}%{bashcompdir}/pip3
-%endif
 sed -i -e "s/^\\(complete.*\\) pip\$/\\1 $pips2/" \
     %{buildroot}%{bashcompdir}/pip
 
 %if 0%{?with_tests}
 %check
 py.test -m 'not network'
-pushd %{py3dir}
-py.test-3.4 -m 'not network'
-popd
 %endif
 
 
@@ -200,6 +122,7 @@ popd
 
 # unfortunately, pip's test suite requires virtualenv >= 1.6 which isn't in
 # fedora yet. Once it is, check can be implemented
+
 
 %files
 %defattr(-,root,root,-)
@@ -210,30 +133,15 @@ popd
 %attr(755,root,root) %{_bindir}/pip2*
 %{python_sitelib}/pip*
 %{bashcompdir}
-%if 0%{?with_python3}
-%exclude %{bashcompdir}/pip3*
-%endif
 %if 0%{?bashcomp2}
 %dir %(dirname %{bashcompdir})
 %endif
 
-%if 0%{?with_python3}
-%files -n python3-pip
-%defattr(-,root,root,-)
-%license LICENSE.txt
-%doc README.rst docs
-%attr(755,root,root) %{_bindir}/pip3*
-%{python3_sitelib}/pip*
-%dir %{bashcompdir}
-%{bashcompdir}/pip3*
-%if 0%{?bashcomp2}
-%dir %(dirname %{bashcompdir})
-%endif
-%endif # with_python3
 
 %changelog
 * Fri Nov 20 2015 Carl George <carl.george@rackspace.com> - 7.1.0-1.ius
 - Initial import from Fedora
+- Remove subpackage structure and related things
 
 * Wed Oct 14 2015 Robert Kuska <rkuska@redhat.com> - 7.1.0-3
 - Rebuilt for Python3.5 rebuild
