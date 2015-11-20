@@ -86,6 +86,9 @@ pip%{python35u_version} install -I dist/%{python35u_wheelname} --root %{buildroo
 %{__python35u} setup.py install -O1 --skip-build --root %{buildroot}
 %endif
 
+rm -f %{buildroot}%{_bindir}/pip
+rm -f %{buildroot}%{_bindir}/pip3
+
 mkdir -p %{buildroot}%{bashcompdir}
 PYTHONPATH=%{buildroot}%{python35u_sitelib} \
     %{buildroot}%{_bindir}/pip%{python35u_version} completion --bash \
@@ -104,7 +107,6 @@ py.test-%{python35u_version} -m 'not network'
 %{!?_licensedir:%global license %%doc}
 %license LICENSE.txt
 %doc README.rst docs
-%attr(755,root,root) %{_bindir}/pip
 %attr(755,root,root) %{_bindir}/pip%{python35u_version}
 %{python35u_sitelib}/pip*
 %{bashcompdir}
@@ -118,6 +120,7 @@ py.test-%{python35u_version} -m 'not network'
 - Initial import from Fedora
 - Remove subpackage structure and related things
 - Use python35u names and macros
+- Remove pip and pip3 to allow parallel installs
 
 * Wed Oct 14 2015 Robert Kuska <rkuska@redhat.com> - 7.1.0-3
 - Rebuilt for Python3.5 rebuild
