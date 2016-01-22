@@ -14,7 +14,7 @@
 %global ius_suffix 35u
 
 Name:           python%{ius_suffix}-%{srcname}
-Version:        8.0.1
+Version:        8.0.2
 Release:        1.ius%{?dist}
 Summary:        A tool for installing and managing Python packages
 
@@ -116,6 +116,9 @@ py.test-%{python35u_version} -m 'not network'
 
 
 %changelog
+* Fri Jan 22 2016 Ben Harper <ben.harper@rackspace.com> - 8.0.2-1.ius
+- Latest upstream
+
 * Thu Jan 21 2016 Ben Harper <ben.harper@rackspace.com> - 8.0.1-1.ius
 - Latest upstream
 - Refresh patch0
