@@ -15,7 +15,7 @@
 
 Name:           python%{ius_suffix}-%{srcname}
 Version:        8.0.2
-Release:        2.ius%{?dist}
+Release:        3.ius%{?dist}
 Summary:        A tool for installing and managing Python packages
 
 Group:          Development/Libraries
@@ -30,7 +30,7 @@ Source0:        http://pypi.python.org/packages/source/p/pip/%{srcname}-%{versio
 Source1:        pip-7.1.0-tests.tar.gz
 %endif
 
-Patch0:         pip-1.5rc1-allow-stripping-prefix-from-wheel-RECORD-files.patch
+Patch0:         pip-8.0.2-allow-stripping-prefix-from-wheel-RECORD-files.patch
 
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
@@ -66,10 +66,7 @@ easy_installable should be pip-installable as well.
 tar -xf %{SOURCE1}
 %endif
 
-# This patch is causing breakage and will be temporally disabled.  The patch
-# will need to be reworked as it is required for the boot strap process.
-# See https://github.com/iuscommunity-pkg/python35u-pip/issues/1#issuecomment-182985977
-#%patch0 -p1
+%patch0 -p1
 
 %{__sed} -i '1d' pip/__init__.py
 
@@ -119,6 +116,9 @@ py.test-%{python35u_version} -m 'not network'
 
 
 %changelog
+* Thu Feb 11 2016 Carl George <carl.george@rackspace.com> - 8.0.2-3.ius
+- Fix patch0, re-enable
+
 * Thu Feb 11 2016 Ben Harper <ben.harper@rackspace.com> - 8.0.2-2.ius
 - disable patch0
 
