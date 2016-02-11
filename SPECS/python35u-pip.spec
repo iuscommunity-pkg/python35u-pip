@@ -15,7 +15,7 @@
 
 Name:           python%{ius_suffix}-%{srcname}
 Version:        8.0.2
-Release:        1.ius%{?dist}
+Release:        2.ius%{?dist}
 Summary:        A tool for installing and managing Python packages
 
 Group:          Development/Libraries
@@ -66,7 +66,10 @@ easy_installable should be pip-installable as well.
 tar -xf %{SOURCE1}
 %endif
 
-%patch0 -p1
+# This patch is causing breakage and will be temporally disabled.  The patch
+# will need to be reworked as it is required for the boot strap process.
+# See https://github.com/iuscommunity-pkg/python35u-pip/issues/1#issuecomment-182985977
+#%patch0 -p1
 
 %{__sed} -i '1d' pip/__init__.py
 
@@ -116,6 +119,9 @@ py.test-%{python35u_version} -m 'not network'
 
 
 %changelog
+* Thu Feb 11 2016 Ben Harper <ben.harper@rackspace.com> - 8.0.2-2.ius
+- disable patch0
+
 * Fri Jan 22 2016 Ben Harper <ben.harper@rackspace.com> - 8.0.2-1.ius
 - Latest upstream
 
