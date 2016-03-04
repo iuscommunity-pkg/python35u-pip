@@ -1,4 +1,3 @@
-%global build_wheel 0
 %global with_tests 0
 
 %global srcname pip
@@ -14,8 +13,8 @@
 %global ius_suffix 35u
 
 Name:           python%{ius_suffix}-%{srcname}
-Version:        8.0.2
-Release:        3.ius%{?dist}
+Version:        8.0.3
+Release:        1.ius%{?dist}
 Summary:        A tool for installing and managing Python packages
 
 Group:          Development/Libraries
@@ -30,8 +29,6 @@ Source0:        http://pypi.python.org/packages/source/p/pip/%{srcname}-%{versio
 Source1:        pip-7.1.0-tests.tar.gz
 %endif
 
-Patch0:         pip-8.0.2-allow-stripping-prefix-from-wheel-RECORD-files.patch
-
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildArch:      noarch
@@ -45,10 +42,6 @@ BuildRequires:  python%{ius_suffix}-pretend
 BuildRequires:  python%{ius_suffix}-freezegun
 BuildRequires:  python%{ius_suffix}-scripttest
 BuildRequires:  python%{ius_suffix}-virtualenv
-%endif
-%if 0%{?build_wheel}
-BuildRequires:  python%{ius_suffix}-pip
-BuildRequires:  python%{ius_suffix}-wheel
 %endif
 Requires:       python%{ius_suffix}-setuptools
 
@@ -66,25 +59,15 @@ easy_installable should be pip-installable as well.
 tar -xf %{SOURCE1}
 %endif
 
-%patch0 -p1
-
 %{__sed} -i '1d' pip/__init__.py
 
 
 %build
-%if 0%{?build_wheel}
-%{__python35u} setup.py bdist_wheel
-%else
 %{__python35u} setup.py build
-%endif
 
 
 %install
-%if 0%{?build_wheel}
-pip%{python35u_version} install -I dist/%{python35u_wheelname} --root %{buildroot} --strip-file-prefix %{buildroot}
-%else
 %{__python35u} setup.py install -O1 --skip-build --root %{buildroot}
-%endif
 
 rm -f %{buildroot}%{_bindir}/pip
 rm -f %{buildroot}%{_bindir}/pip3
@@ -116,6 +99,10 @@ py.test-%{python35u_version} -m 'not network'
 
 
 %changelog
+* Fri Mar 04 2016 Ben Harper <ben.harper@rackspace.com> - 8.0.3-1.ius
+- Latest upstream
+- remove with_rewheel macro
+
 * Thu Feb 11 2016 Carl George <carl.george@rackspace.com> - 8.0.2-3.ius
 - Fix patch0, re-enable
 
