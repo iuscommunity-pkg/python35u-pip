@@ -20,13 +20,11 @@ URL:            http://www.pip-installer.org
 Source0:        http://pypi.python.org/packages/source/p/pip/%{srcname}-%{version}.tar.gz
 
 # to get tests:
-# git clone https://github.com/pypa/pip && cd fig
-# git checkout 1.5.6 && tar -czvf pip-1.5.6-tests.tar.gz tests/
+# git clone https://github.com/pypa/pip && cd pip
+# git checkout %%{version} && tar -czvf pip-%%{version}-tests.tar.gz tests/
 %if 0%{?with_tests}
-Source1:        pip-7.1.0-tests.tar.gz
+Source1:        pip-%{version}-tests.tar.gz
 %endif
-
-BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 
 BuildArch:      noarch
 BuildRequires:  bash-completion
