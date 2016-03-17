@@ -10,7 +10,7 @@
 %global ius_suffix 35u
 
 Name:           python%{ius_suffix}-%{srcname}
-Version:        8.0.3
+Version:        8.1.0
 Release:        1.ius%{?dist}
 Summary:        A tool for installing and managing Python packages
 
@@ -96,6 +96,9 @@ py.test-%{python35u_version} -m 'not network'
 
 
 %changelog
+* Thu Mar 17 2016 Carl George <carl.george@rackspace.com> - 8.1.0-1.ius
+- Latest upstream
+
 * Fri Mar 04 2016 Ben Harper <ben.harper@rackspace.com> - 8.0.3-1.ius
 - Latest upstream
 - remove with_rewheel macro
