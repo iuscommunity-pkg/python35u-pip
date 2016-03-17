@@ -54,7 +54,7 @@ easy_installable should be pip-installable as well.
 tar -xf %{SOURCE1}
 %endif
 
-%{__sed} -i '1d' pip/__init__.py
+find %{srcname} -type f -name \*.py -print0 | xargs -0 sed -i -e '1 {/^#!\//d}'
 
 
 %build
@@ -96,6 +96,7 @@ py.test-%{python35u_version} -m 'not network'
 %changelog
 * Thu Mar 17 2016 Carl George <carl.george@rackspace.com> - 8.1.0-1.ius
 - Latest upstream
+- Strip all shebangs
 
 * Fri Mar 04 2016 Ben Harper <ben.harper@rackspace.com> - 8.0.3-1.ius
 - Latest upstream
