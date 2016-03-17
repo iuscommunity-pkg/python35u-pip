@@ -16,8 +16,8 @@ Summary:        A tool for installing and managing Python packages
 
 Group:          Development/Libraries
 License:        MIT
-URL:            http://www.pip-installer.org
-Source0:        http://pypi.python.org/packages/source/p/pip/%{srcname}-%{version}.tar.gz
+URL:            https://pip.pypa.io
+Source0:        https://pypi.python.org/packages/source/p/pip/%{srcname}-%{version}.tar.gz
 
 # to get tests:
 # git clone https://github.com/pypa/pip && cd pip
