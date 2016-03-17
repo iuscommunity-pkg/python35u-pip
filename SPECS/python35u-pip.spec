@@ -1,9 +1,6 @@
 %global with_tests 0
 
 %global srcname pip
-%if 0%{?build_wheel}
-%global python35u_wheelname %{srcname}-%{version}-py2.py3-none-any.whl
-%endif
 
 %global bashcompdir %(b=$(pkg-config --variable=completionsdir bash-completion 2>/dev/null); echo ${b:-%{_sysconfdir}/bash_completion.d})
 %if "%{bashcompdir}" != "%{_sysconfdir}/bash_completion.d"
